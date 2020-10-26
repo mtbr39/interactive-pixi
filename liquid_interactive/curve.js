@@ -1,8 +1,14 @@
 // pixi.jsのアプリケーションを作成
-const app = new PIXI.Application();
+const app = new PIXI.Application({
+    resolution: window.devicePixelRatio || 1,
+    autoDensity: true,
+    antialias: false
+});
 
 // bodyにpixi.jsのview(ステージ)を追加する
 document.body.appendChild(app.view);
+
+console.log(PIXI.Graphics.CURVES);
 
 // //***クリックリスナー生成
 // const clicklistener = new GraphicsObject(0, 0, app.view.width, app.view.height, 0x444444);
@@ -30,10 +36,6 @@ document.body.appendChild(app.view);
 // player.destination = destination;
 // app.stage.addChild(player);
 
-// app.ticker.add(delta => mainUpdate());
-// var mainUpdate = function () {
-//     changeSyncPosition(playerID, player.x, player.y);
-// }
 
 // window.addEventListener('beforeunload', (event) => {
 //     deleteSyncPlayer(playerID);
@@ -54,7 +56,7 @@ realPath.position.y = 50;
 
 // app.stage.addChild(realPath);
 
-const bezier = new PIXI.Graphics();
+const bezier = new PIXI.Graphics({adaptive: true});
 
 bezier.lineStyle(0, 0xAA0000, 1)
     .beginFill(0x2277EE, 1)
@@ -79,3 +81,25 @@ bezier1.position.x = 50;
 bezier1.position.y = 50;
 
 app.stage.addChild(bezier1);
+
+console.log(bezier);
+
+//quadra
+const qua = new PIXI.Graphics({adaptive: true});
+
+qua.lineStyle(0, 0xAA0000, 1)
+    .beginFill(0x2277EE, 1)
+    .quadraticCurveTo(200, 200, 100, 300);
+
+qua.position.x = 50;
+qua.position.y = 100;
+
+app.stage.addChild(qua);
+
+
+let t = 0;
+app.ticker.add(delta => mainUpdate());
+var mainUpdate = function () {
+    //bezier.bezierCurveTo(100+t, 200+t, 100, 200, 240, 100);
+    // app.stage.addChild(bezier);
+}
