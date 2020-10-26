@@ -56,9 +56,13 @@ realPath.position.y = 50;
 
 const bezier = new PIXI.Graphics();
 
-bezier.lineStyle(0, 0xAA0000, 1);
-bezier.beginFill(0x2277EE, 1);
-bezier.bezierCurveTo(100, 200, 100, 200, 240, 100);
+bezier.lineStyle(0, 0xAA0000, 1)
+    .beginFill(0x2277EE, 1)
+    .moveTo(0, 0)
+    .bezierCurveTo(100, 200, 100, 200, 240, 100)
+    .bezierCurveTo(200, 200, 300, 200, 400, 150);
+
+
 
 bezier.position.x = 50;
 bezier.position.y = 50;
