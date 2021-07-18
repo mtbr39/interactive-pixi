@@ -9,9 +9,7 @@ class GraphicsObject extends PIXI.Graphics {
         this.beginFill(color);
         this.drawRect(0, 0, w, h);
         this.endFill();
-
     }
-
 }
 
 class MoveObject extends GraphicsObject {
@@ -21,8 +19,7 @@ class MoveObject extends GraphicsObject {
         this.vy = 0;
         this.destination = null;
         this.speed = 5;
-        app.ticker.add(delta => this.update());
-
+        app.ticker.add((delta) => this.update());
     }
 
     goto_destination() {
@@ -30,22 +27,24 @@ class MoveObject extends GraphicsObject {
         let cx = this.x + this.width / 2.0;
         let cy = this.y + this.height / 2.0;
         if (cx - gap < this.destination.x && this.destination.x < cx + gap) {
-            if (cy - gap < this.destination.y && this.destination.y < cy + gap) {
+            if (
+                cy - gap < this.destination.y &&
+                this.destination.y < cy + gap
+            ) {
                 this.vx = 0;
                 this.vy = 0;
                 return;
             }
         }
         let angle = Math.atan2(
-            this.destination.y - (cy),
-            this.destination.x - (cx)
+            this.destination.y - cy,
+            this.destination.x - cx
         );
         this.vx = this.speed * Math.cos(angle);
         this.vy = this.speed * Math.sin(angle);
     }
 
     update() {
-
         this.goto_destination();
         this.x += this.vx;
         this.y += this.vy;
@@ -56,8 +55,5 @@ class OtherPlayer extends GraphicsObject {
     constructor(playerID) {
         super();
         this.playerID = playerID;
-
     }
-
-
 }
