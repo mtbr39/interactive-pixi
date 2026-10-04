@@ -9,13 +9,19 @@ var firebaseConfig = {
     appId: "1:301848700297:web:89ae334fa4a60057242d58",
     measurementId: "G-R4MBPVDJQ8",
 };
+// Firebase への読み書きは URL に ?online を付けたときだけ行う（例: index.html?online）。
+// 付けないときはオフライン表示で、自分の四角が動くだけ。
+var USE_FIREBASE = new URLSearchParams(location.search).has("online");
+
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-firebase.analytics();
+if (USE_FIREBASE) {
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+}
 
 //// let syncPos = { x: -1, y: -1 };
 
-var db = firebase.database();
+var db = USE_FIREBASE ? firebase.database() : null;
 
 var playerIdList = [];
 
@@ -25,6 +31,7 @@ var playerIdList = [];
 // });
 //入力内容を更新した時
 var changeSyncPosition = function (playerID, x, y) {
+    if (!db) return;
     ref = db.ref("/game/all/player");
     ref.child(playerID).update({
         sync_player: {
@@ -35,12 +42,14 @@ var changeSyncPosition = function (playerID, x, y) {
 };
 
 var setSyncPlayer = function (_sync_player) {
+    if (!db) return "offline";
     ref = db.ref("/game/all/player");
     newPlayerRef = ref.push({ sync_player: _sync_player });
     return newPlayerRef.key;
 };
 
 var deleteSyncPlayer = function (_playerID) {
+    if (!db) return;
     ref = db.ref("/game/all/player");
     ref.child(_playerID).remove();
 };
@@ -67,18 +76,20 @@ var addOtherPlayer = function (playerID) {
     app.stage.addChild(otherPlayer);
 };
 
-ref = db.ref("/game/all/player");
-ref.on("child_added", function (snapshot) {
-    playerIdList.push(snapshot.key);
-    addOtherPlayer(snapshot.key);
-    ref.child(snapshot.key).on("value", onPlayerValue); //game/all/playerのsnapshot.keyの変更時に実行する関数を登録
-    console.log("firebase_realtimedb.js Add!", playerIdList);
-});
-ref.on("child_removed", function (snapshot) {
-    playerIdList.splice(playerIdList.indexOf(snapshot.key), 1);
-    ref.child(snapshot.key).off();
-    console.log("firebase_realtimedb.js Delete!", playerIdList);
-});
+if (db) {
+    ref = db.ref("/game/all/player");
+    ref.on("child_added", function (snapshot) {
+        playerIdList.push(snapshot.key);
+        addOtherPlayer(snapshot.key);
+        ref.child(snapshot.key).on("value", onPlayerValue); //game/all/playerのsnapshot.keyの変更時に実行する関数を登録
+        console.log("firebase_realtimedb.js Add!", playerIdList);
+    });
+    ref.on("child_removed", function (snapshot) {
+        playerIdList.splice(playerIdList.indexOf(snapshot.key), 1);
+        ref.child(snapshot.key).off();
+        console.log("firebase_realtimedb.js Delete!", playerIdList);
+    });
+}
 
 var onPlayerValue = function (snapshot) {
     otherPlayers.forEach(function (otherPlayer) {
